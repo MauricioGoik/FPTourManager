@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FPTour Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+        .screen { display: none; min-height: 100dvh; }
+        .screen.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .fade-in { animation: fadeIn 0.25s ease forwards; }
+        .slide-in { animation: slideIn 0.25s ease forwards; }
+        ::-webkit-scrollbar { width: 0; background: transparent; }
+        .tab-btn.active { background: #2563eb; color: white; }
+        .tab-btn { background: #f1f5f9; color: #64748b; }
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-card { animation: modalIn 0.2s ease forwards; }
+    </style>
+</head>
+<body class="bg-slate-100 flex justify-center">
+<div class="w-full max-w-sm bg-white min-h-dvh relative overflow-x-hidden shadow-xl">
+
+    <!-- ===== PANTALLA 1: LOGIN ===== -->
+    <div id="s-login" class="screen active items-center justify-center p-6"
+         style="background: linear-gradient(145deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%)">
+        <div class="w-full max-w-xs">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
+                    <span style="font-size:2.8rem">✈️</span>
+                </div>
+                <h1 class="text-white text-3xl font-black tracking-tight">FPTour</h1>
+                <p class="text-blue-200 text-sm font-semibold tracking-widest uppercase mt-0.5">Manager</p>
+                <p class="text-blue-100/80 text-xs mt-2">Gestión de Viajes Educativos</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-2xl">
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                        Correo electrónico
+                    </label>
+                    <input type="email" id="inp-email" value="m.garcia@centrofp.es"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                        Contraseña
+                    </label>
+                    <input type="password" id="inp-pass" value="demo1234"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                </div>
+                <button id="btn-login" onclick="doLogin(this)"
+                    class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200">
+                    Iniciar Sesión
+                </button>
+                <p class="text-center text-xs text-slate-400 mt-4 leading-relaxed">
+                    🔒 <em>Demo: cualquier credencial funciona</em>
+                </p>
+            </div>
+
+            <p class="text-center text-blue-200/60 text-xs mt-6">Centro FP Tajamar · v1.0-MVP</p>
+        </div>
+    </div>
+
+    <!-- ===== PANTALLA 2: DASHBOARD ===== -->
+    <div id="s-dashboard" class="screen flex-col">
+        <!-- Header azul con curva -->
+        <div class="bg-gradient-to-br from-blue-700 to-blue-500 px-5 pt-6 pb-12">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-blue-200 text-xs uppercase tracking-widest font-semibold">Panel de Control</p>
+                    <h2 class="text-white text-xl font-black mt-0.5">Hola, Marta 👋</h2>
+                    <p class="text-blue-100/70 text-xs mt-0.5">Coordinadora · IES Tajamar</p>
+                </div>
+                <button onclick="doLogout()"
+                    class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-black hover:bg-white/30 transition-colors backdrop-blur border border-white/20">
+                    MG
+                </button>
+            </div>
+            <!-- KPIs -->
+            <div class="flex gap-2.5 mt-5">
+                <div class="flex-1 bg-white/15 rounded-2xl p-3 text-center backdrop-blur border border-white/10">
+                    <div class="text-white text-2xl font-black">3</div>
+                    <div class="text-blue-100 text-xs mt-0.5">Tours</div>
+                </div>
+                <div class="flex-1 bg-white/15 rounded-2xl p-3 text-center backdrop-blur border border-white/10">
+                    <div class="text-white text-2xl font-black">1</div>
+                    <div class="text-blue-100 text-xs mt-0.5">En curso</div>
+                </div>
+                <div class="flex-1 bg-white/15 rounded-2xl p-3 text-center backdrop-blur border border-white/10">
+                    <div class="text-white text-2xl font-black">62</div>
+                    <div class="text-blue-100 text-xs mt-0.5">Alumnos</div>
+                </div>
+                <div class="flex-1 bg-white/15 rounded-2xl p-3 text-center backdrop-blur border border-white/10">
+                    <div class="text-white text-2xl font-black">2</div>
+                    <div class="text-blue-100 text-xs mt-0.5">Pendiente</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de tours (encima del header, efecto tarjeta flotante) -->
+        <div class="-mt-6 px-4 pb-8 overflow-y-auto flex-1">
+
+            <p class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2.5 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Tours Activos
+            </p>
+            <div id="tours-activos"></div>
+
+            <p class="text-xs font-black uppercase tracking-widest text-amber-600 mb-2.5 mt-5 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Próximos Tours
+            </p>
+            <div id="tours-planificados"></div>
+
+            <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2.5 mt-5 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span> Finalizados
+            </p>
+            <div id="tours-completados"></div>
+        </div>
+    </div>
+
+    <!-- ===== PANTALLA 3: DETALLE DE TOUR ===== -->
+    <div id="s-tour-detail" class="screen flex-col overflow-y-auto">
+        <div id="tour-detail-content"></div>
+    </div>
+
+    <!-- ===== PANTALLA 4: ITINERARIO ===== -->
+    <div id="s-itinerary" class="screen flex-col">
+        <div id="itinerary-content" class="flex-1 overflow-y-auto pb-28"></div>
+        <!-- CTA fijo abajo -->
+        <div class="fixed bottom-0 w-full max-w-sm bg-white border-t border-slate-100 p-4 shadow-2xl z-20">
+            <button onclick="showNotify()"
+                class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100">
+                🔔 &nbsp;Notificar cambio de hora a alumnos
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: NOTIFICACIÓN ENVIADA ===== -->
+    <div id="modal-notify"
+         class="hidden fixed inset-0 bg-black/60 items-center justify-center z-50 p-6 backdrop-blur-sm"
+         style="max-width:384px; left:50%; transform:translateX(-50%);">
+        <div class="bg-white rounded-3xl p-6 w-full shadow-2xl modal-card">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-emerald-100">
+                    <span style="font-size:2.5rem">✅</span>
+                </div>
+                <h3 class="text-xl font-black text-slate-800">¡Notificación enviada!</h3>
+                <p class="text-slate-500 text-sm mt-2 leading-relaxed">
+                    Se ha notificado a
+                    <strong class="text-blue-600" id="notify-count">24</strong> alumnos
+                    y <strong class="text-blue-600" id="notify-profs">2</strong> profesores
+                    sobre el cambio de horario.
+                </p>
+                <div class="bg-slate-50 rounded-2xl p-4 mt-4 text-left text-xs text-slate-600 space-y-1 border border-slate-100">
+                    <p class="font-semibold text-slate-700 mb-2">📧 Notificaciones enviadas vía:</p>
+                    <p>• Email corporativo del centro</p>
+                    <p>• SMS a tutores legales</p>
+                    <p>• Notificación push en la app</p>
+                    <p class="mt-2 pt-2 border-t border-slate-200 text-slate-400">
+                        Enviado a las <span class="font-medium text-slate-500" id="notify-time"></span>
+                    </p>
+                </div>
+                <button onclick="hideNotify()"
+                    class="mt-5 w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-blue-700 active:scale-95 transition-all">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /app-frame -->
+
+<script>
+// ==================== DATOS MOCK ====================
+const DATA = {
+    user: { name: "Marta García", role: "Coordinadora", email: "m.garcia@centrofp.es" },
+    tours: [
+        {
+            id: 1,
+            nombre: "Viaje a Londres 2025",
+            destino: "Londres, Reino Unido",
+            emoji: "🇬🇧",
+            gradiente: "from-blue-600 to-indigo-700",
+            gradienteCSS: "linear-gradient(135deg,#2563eb,#4338ca)",
+            fechas: "15 – 22 Jun 2025",
+            estado: "activo",
+            grupo: "2º DAM",
+            alumnos: 24,
+            presupuesto: "1.200 € / alumno",
+            profesores: [
+                { nombre: "Carlos Ramírez", rol: "Responsable", iniciales: "CR" },
+                { nombre: "Ana López", rol: "Acompañante", iniciales: "AL" }
+            ],
+            documentos: [
+                { nombre: "Itinerario definitivo v3.pdf", estado: "ok" },
+                { nombre: "Autorizaciones firmadas (22/24)", estado: "warning" },
+                { nombre: "Seguro de viaje colectivo.pdf", estado: "ok" },
+                { nombre: "Lista de alumnos.xlsx", estado: "ok" }
+            ],
+            itinerario: [
+                {
+                    dia: "Lunes 15 Jun", resumen: "Salida y llegada a Londres",
+                    actividades: [
+                        { hora: "06:30", desc: "Concentración en el centro educativo", icon: "📍" },
+                        { hora: "08:15", desc: "Vuelo MAD → LHR (Iberia IB3170)", icon: "✈️" },
+                        { hora: "10:30", desc: "Llegada a Heathrow — Terminal 5", icon: "🛬" },
+                        { hora: "12:00", desc: "Traslado en metro al hotel (Zone 1)", icon: "🚇" },
+                        { hora: "14:00", desc: "Check-in Hotel Premier Inn Southwark", icon: "🏨" },
+                        { hora: "16:00", desc: "Paseo libre por el South Bank", icon: "🌉" },
+                        { hora: "20:00", desc: "Cena en grupo — restaurante reservado", icon: "🍽️" }
+                    ]
+                },
+                {
+                    dia: "Martes 16 Jun", resumen: "Visitas a empresas tecnológicas",
+                    actividades: [
+                        { hora: "09:00", desc: "Visita empresa: Thoughtworks London", icon: "🏢" },
+                        { hora: "11:30", desc: "Charla: 'Scrum en proyectos reales'", icon: "💬" },
+                        { hora: "13:30", desc: "Almuerzo libre (dietas 8 €/alumno)", icon: "🥗" },
+                        { hora: "15:30", desc: "Visita empresa: Capgemini UK HQ", icon: "🏢" },
+                        { hora: "18:00", desc: "Tiempo libre — Covent Garden", icon: "🛍️" },
+                        { hora: "21:00", desc: "Regreso al hotel. Toque de queda: 23:00h", icon: "🏨" }
+                    ]
+                },
+                {
+                    dia: "Miércoles 17 Jun", resumen: "Cultura y tecnología",
+                    actividades: [
+                        { hora: "09:30", desc: "Natural History Museum (visita guiada)", icon: "🦕" },
+                        { hora: "13:00", desc: "Almuerzo libre en zona del museo", icon: "🥗" },
+                        { hora: "15:00", desc: "Tour por Tech City / Silicon Roundabout", icon: "💻" },
+                        { hora: "18:30", desc: "Regreso al hotel", icon: "🏨" },
+                        { hora: "21:00", desc: "Reunión de grupo — resumen del día", icon: "📋" }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 2,
+            nombre: "Intercambio Berlín",
+            destino: "Berlín, Alemania",
+            emoji: "🇩🇪",
+            gradiente: "from-slate-700 to-slate-900",
+            gradienteCSS: "linear-gradient(135deg,#475569,#0f172a)",
+            fechas: "1 – 8 Jul 2025",
+            estado: "planificado",
+            grupo: "2º ASIR",
+            alumnos: 20,
+            presupuesto: "980 € / alumno",
+            profesores: [
+                { nombre: "Miguel Torres", rol: "Responsable", iniciales: "MT" },
+                { nombre: "Elena Pérez", rol: "Acompañante", iniciales: "EP" }
+            ],
+            documentos: [
+                { nombre: "Borrador itinerario v1.docx", estado: "warning" },
+                { nombre: "Presupuesto provisional.xlsx", estado: "ok" }
+            ],
+            itinerario: []
+        },
+        {
+            id: 3,
+            nombre: "Visita Tech Barcelona",
+            destino: "Barcelona, España",
+            emoji: "🇪🇸",
+            gradiente: "from-rose-500 to-orange-500",
+            gradienteCSS: "linear-gradient(135deg,#f43f5e,#f97316)",
+            fechas: "10 Jun 2025",
+            estado: "completado",
+            grupo: "1º DAW",
+            alumnos: 18,
+            presupuesto: "95 € / alumno",
+            profesores: [
+                { nombre: "Sara Molina", rol: "Responsable", iniciales: "SM" }
+            ],
+            documentos: [
+                { nombre: "Informe post-visita.pdf", estado: "ok" },
+                { nombre: "Fotos grupo (Google Drive)", estado: "ok" }
+            ],
+            itinerario: []
+        }
+    ]
+};
+
+let currentTour = null;
+let currentDay = 0;
+
+// ==================== NAVEGACIÓN ====================
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// ==================== LOGIN ====================
+function doLogin(btn) {
+    btn.innerHTML = '<span class="opacity-60">Entrando...</span>';
+    btn.disabled = true;
+    setTimeout(() => {
+        renderDashboard();
+        showScreen('s-dashboard');
+    }, 700);
+}
+
+function doLogout() {
+    const btn = document.getElementById('btn-login');
+    btn.innerHTML = 'Iniciar Sesión';
+    btn.disabled = false;
+    showScreen('s-login');
+}
+
+// ==================== DASHBOARD ====================
+const BADGE = {
+    activo:      { label: 'Activo',       cls: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+    planificado: { label: 'Planificado',  cls: 'bg-amber-100 text-amber-700 border-amber-200' },
+    completado:  { label: 'Completado',   cls: 'bg-slate-100 text-slate-500 border-slate-200' }
+};
+
+function tourCard(tour) {
+    const b = BADGE[tour.estado];
+    const dim = tour.estado === 'completado' ? 'opacity-60' : '';
+    const docsWarning = tour.documentos.some(d => d.estado === 'warning');
+    return `
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 overflow-hidden cursor-pointer
+                hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all ${dim}"
+         onclick="openTour(${tour.id})">
+        <div class="p-4 flex items-center gap-3" style="background:${tour.gradienteCSS}">
+            <span style="font-size:2.2rem; filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))">${tour.emoji}</span>
+            <div class="flex-1 min-w-0">
+                <h3 class="text-white font-bold text-sm leading-tight truncate">${tour.nombre}</h3>
+                <p class="text-white/75 text-xs mt-0.5 truncate">${tour.destino}</p>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+                <span class="bg-white/25 text-white text-xs px-2 py-0.5 rounded-full font-semibold backdrop-blur">${tour.grupo}</span>
+                ${docsWarning ? '<span class="bg-amber-400 text-white text-xs px-2 py-0.5 rounded-full font-semibold">⚠️ Docs</span>' : ''}
+            </div>
+        </div>
+        <div class="px-4 py-2.5 flex items-center justify-between">
+            <div class="text-xs text-slate-500">
+                📅 <span class="font-semibold text-slate-700">${tour.fechas}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400">👤 ${tour.alumnos}</span>
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full border ${b.cls}">${b.label}</span>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderDashboard() {
+    ['activos', 'planificados', 'completados'].forEach(estado => {
+        const estadoKey = estado === 'activos' ? 'activo' : estado === 'planificados' ? 'planificado' : 'completado';
+        document.getElementById(`tours-${estado}`).innerHTML =
+            DATA.tours.filter(t => t.estado === estadoKey).map(tourCard).join('') || '';
+    });
+}
+
+// ==================== DETALLE TOUR ====================
+function openTour(id) {
+    currentTour = DATA.tours.find(t => t.id === id);
+    currentDay = 0;
+    renderTourDetail();
+    showScreen('s-tour-detail');
+}
+
+function renderTourDetail() {
+    const t = currentTour;
+    const b = BADGE[t.estado];
+
+    const docs = t.documentos.map(d => `
+        <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
+            <span class="text-lg">${d.estado === 'ok' ? '📄' : '⚠️'}</span>
+            <span class="text-sm text-slate-700 flex-1 leading-tight">${d.nombre}</span>
+            ${d.estado === 'warning'
+                ? '<span class="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Pendiente</span>'
+                : '<span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK</span>'}
+        </div>`).join('');
+
+    const profs = t.profesores.map(p => `
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-xs flex-shrink-0"
+                 style="background:${t.gradienteCSS}">
+                ${p.iniciales}
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-slate-700">${p.nombre}</p>
+                <p class="text-xs text-slate-400">${p.rol}</p>
+            </div>
+        </div>`).join('');
+
+    const hasItinerary = t.itinerario && t.itinerario.length > 0;
+
+    document.getElementById('tour-detail-content').innerHTML = `
+    <div class="slide-in">
+        <!-- Hero -->
+        <div class="px-5 pt-6 pb-14" style="background:${t.gradienteCSS}">
+            <button onclick="showScreen('s-dashboard')"
+                class="text-white/80 text-sm flex items-center gap-1 mb-5 hover:text-white transition-colors">
+                ← Volver
+            </button>
+            <div class="flex items-center gap-4">
+                <span style="font-size:3rem; filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))">${t.emoji}</span>
+                <div>
+                    <h2 class="text-white text-xl font-black leading-tight">${t.nombre}</h2>
+                    <p class="text-white/75 text-sm mt-1">${t.destino}</p>
+                    <span class="inline-block mt-1.5 text-xs font-bold px-3 py-0.5 rounded-full border ${b.cls}">${b.label}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 -mt-6 pb-8 space-y-4">
+
+            <!-- Info grid -->
+            <div class="bg-white rounded-2xl shadow-md p-4 border border-slate-50">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Fechas</p>
+                        <p class="text-sm font-bold text-slate-700">📅 ${t.fechas}</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Grupo</p>
+                        <p class="text-sm font-bold text-slate-700">🎓 ${t.grupo}</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Alumnos</p>
+                        <p class="text-sm font-bold text-slate-700">👤 ${t.alumnos} alumnos</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-1">Coste</p>
+                        <p class="text-sm font-bold text-slate-700">💶 ${t.presupuesto}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profesores -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">
+                    👨‍🏫 Profesores responsables
+                </h3>
+                <div class="space-y-3">${profs}</div>
+            </div>
+
+            <!-- Documentación -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                    📁 Documentación
+                </h3>
+                ${docs}
+            </div>
+
+            <!-- CTA -->
+            ${hasItinerary
+                ? `<button onclick="openItinerary()"
+                    class="w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 text-white active:scale-95 transition-all shadow-lg"
+                    style="background:${t.gradienteCSS}">
+                    📅 Ver Itinerario →
+                  </button>`
+                : `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                    <p class="text-amber-700 text-sm font-semibold">⏳ Itinerario en preparación</p>
+                    <p class="text-amber-500 text-xs mt-1">Disponible próximamente</p>
+                   </div>`}
+        </div>
+    </div>`;
+}
+
+// ==================== ITINERARIO ====================
+function openItinerary() {
+    renderItinerary();
+    showScreen('s-itinerary');
+}
+
+function renderItinerary() {
+    const t = currentTour;
+    const day = t.itinerario[currentDay];
+
+    const tabs = t.itinerario.map((d, i) => `
+        <button onclick="switchDay(${i})" id="tab-${i}"
+            class="tab-btn ${i === currentDay ? 'active' : ''} px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex-1">
+            Día ${i+1}
+        </button>`).join('');
+
+    const activities = day.actividades.map((a, idx) => `
+        <div class="flex gap-3 relative">
+            ${idx < day.actividades.length - 1
+                ? '<div class="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-100 z-0"></div>'
+                : ''}
+            <div class="w-10 h-10 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center flex-shrink-0 z-10">
+                <span style="font-size:1.15rem">${a.icon}</span>
+            </div>
+            <div class="flex-1 pb-5 min-w-0">
+                <span class="text-xs font-black text-blue-600 tracking-wide">${a.hora}</span>
+                <p class="text-sm text-slate-700 mt-0.5 leading-relaxed">${a.desc}</p>
+            </div>
+        </div>`).join('');
+
+    document.getElementById('itinerary-content').innerHTML = `
+    <div class="fade-in">
+        <!-- Header -->
+        <div class="px-5 pt-6 pb-6" style="background:${t.gradienteCSS}">
+            <button onclick="showScreen('s-tour-detail')"
+                class="text-white/80 text-sm flex items-center gap-1 mb-4 hover:text-white transition-colors">
+                ← Volver al tour
+            </button>
+            <h2 class="text-white text-lg font-black">📅 Itinerario</h2>
+            <p class="text-white/75 text-sm">${t.nombre}</p>
+        </div>
+
+        <!-- Tabs de días -->
+        <div class="px-4 py-3 flex gap-2 bg-white border-b border-slate-100 sticky top-0 z-10 shadow-sm">
+            ${tabs}
+        </div>
+
+        <!-- Encabezado del día -->
+        <div class="px-5 py-3 bg-slate-50 border-b border-slate-100">
+            <p class="text-sm font-black text-slate-700">${day.dia}</p>
+            <p class="text-xs text-slate-400 mt-0.5">${day.resumen} · ${day.actividades.length} actividades</p>
+        </div>
+
+        <!-- Timeline de actividades -->
+        <div class="px-5 py-5 space-y-0">
+            ${activities}
+        </div>
+    </div>`;
+}
+
+function switchDay(i) {
+    currentDay = i;
+    renderItinerary();
+}
+
+// ==================== NOTIFICACIÓN ====================
+function showNotify() {
+    const t = currentTour;
+    document.getElementById('notify-count').textContent = t.alumnos;
+    document.getElementById('notify-profs').textContent = t.profesores.length;
+    const now = new Date();
+    document.getElementById('notify-time').textContent =
+        now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) +
+        ' · ' +
+        now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    const modal = document.getElementById('modal-notify');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function hideNotify() {
+    const modal = document.getElementById('modal-notify');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+</script>
+</body>
+</html>

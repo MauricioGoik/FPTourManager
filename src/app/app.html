@@ -1,0 +1,449 @@
+<!-- ================================================================
+     MODO ESCRITORIO
+     ================================================================ -->
+@if (state.viewMode() === 'desktop') {
+<div class="min-h-screen bg-slate-100 flex flex-col">
+
+  <!-- ── Topbar ── -->
+  <header class="h-16 flex-shrink-0 flex items-center justify-between px-6
+                 shadow-md z-30"
+          style="background:linear-gradient(135deg,#1d4ed8,#2563eb)">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow text-xl">✈️</div>
+      <div>
+        <h1 class="text-white font-black text-lg leading-none">FPTour Manager</h1>
+        <p class="text-blue-200 text-[10px] uppercase tracking-widest">IES Tajamar</p>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex items-center gap-3">
+      <!-- Toggle vista -->
+      <button (click)="state.toggleViewMode()"
+        class="flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white text-xs font-bold
+               px-4 py-2 rounded-full border border-white/20 transition-all backdrop-blur">
+        📱 <span>Ver como móvil</span>
+      </button>
+      <!-- Usuario (solo si autenticado) -->
+      @if (state.screen() !== 'login') {
+        <button (click)="state.logout()"
+          class="flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white text-xs font-bold
+                 px-4 py-2 rounded-full border border-white/20 transition-all">
+          <span class="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center font-black text-xs">MG</span>
+          Cerrar sesión
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- ── Cuerpo ── -->
+  @if (state.screen() === 'login') {
+    <!-- Login ocupa todo el espacio restante -->
+    <div class="flex-1">
+      <app-login />
+    </div>
+  } @else {
+    <div class="flex flex-1 overflow-hidden">
+
+      <!-- ── Sidebar ── -->
+      <aside class="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-100 bg-slate-50">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Mis Tours</p>
+        </div>
+        <div class="flex-1 overflow-y-auto no-scrollbar py-2">
+
+          <!-- Activos -->
+          <p class="px-4 pt-3 pb-1.5 text-[9px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>Activos
+          </p>
+          @for (t of toursActivos; track t.id) {
+            <button (click)="state.selectTour(t)"
+              [class]="'w-full text-left px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-blue-50 '
+                       + (isSelected(t) ? 'bg-blue-50 border-r-2 border-blue-600' : '')">
+              <span class="text-2xl flex-shrink-0">{{ t.emoji }}</span>
+              <div class="flex-1 min-w-0">
+                <p [class]="'text-sm font-bold truncate ' + (isSelected(t) ? 'text-blue-700' : 'text-slate-700')">{{ t.nombre }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ t.grupo }} · {{ t.fechas }}</p>
+              </div>
+              @if (hasWarning(t)) { <span class="text-amber-400 text-xs flex-shrink-0">⚠️</span> }
+            </button>
+          }
+
+          <!-- Planificados -->
+          <p class="px-4 pt-4 pb-1.5 text-[9px] font-black uppercase tracking-widest text-amber-600 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>Próximos
+          </p>
+          @for (t of toursPlanificados; track t.id) {
+            <button (click)="state.selectTour(t)"
+              [class]="'w-full text-left px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-blue-50 '
+                       + (isSelected(t) ? 'bg-blue-50 border-r-2 border-blue-600' : '')">
+              <span class="text-2xl flex-shrink-0">{{ t.emoji }}</span>
+              <div class="flex-1 min-w-0">
+                <p [class]="'text-sm font-bold truncate ' + (isSelected(t) ? 'text-blue-700' : 'text-slate-700')">{{ t.nombre }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ t.grupo }} · {{ t.fechas }}</p>
+              </div>
+            </button>
+          }
+
+          <!-- Completados -->
+          <p class="px-4 pt-4 pb-1.5 text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block"></span>Finalizados
+          </p>
+          @for (t of toursCompletados; track t.id) {
+            <button (click)="state.selectTour(t)"
+              [class]="'w-full text-left px-4 py-2.5 flex items-center gap-3 transition-all hover:bg-slate-50 opacity-60 '
+                       + (isSelected(t) ? 'bg-slate-50 border-r-2 border-slate-400 opacity-100' : '')">
+              <span class="text-2xl flex-shrink-0">{{ t.emoji }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-slate-600 truncate">{{ t.nombre }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ t.grupo }} · {{ t.fechas }}</p>
+              </div>
+            </button>
+          }
+        </div>
+
+        <!-- Stats en el fondo del sidebar -->
+        <div class="border-t border-slate-100 px-4 py-3 bg-slate-50 grid grid-cols-2 gap-2">
+          @for (kpi of [
+            {val: state.tourStats.total,      label:'Tours totales'},
+            {val: state.tourStats.alumnos,    label:'Alumnos'}
+          ]; track kpi.label) {
+            <div class="text-center">
+              <p class="text-xl font-black text-blue-600">{{ kpi.val }}</p>
+              <p class="text-[10px] text-slate-400">{{ kpi.label }}</p>
+            </div>
+          }
+        </div>
+      </aside>
+
+      <!-- ── Main content ── -->
+      <main class="flex-1 overflow-y-auto no-scrollbar">
+
+        @switch (state.screen()) {
+
+          @case ('dashboard') {
+            <!-- Panel de bienvenida escritorio -->
+            <div class="p-8 max-w-5xl anim-fade">
+              <div class="mb-8">
+                <h2 class="text-2xl font-black text-slate-800">Bienvenida, Marta 👋</h2>
+                <p class="text-slate-400 text-sm mt-1">Coordinadora · IES Tajamar · Panel de control</p>
+              </div>
+
+              <!-- KPIs -->
+              <div class="grid grid-cols-4 gap-4 mb-8">
+                @for (kpi of [
+                  {val: state.tourStats.total,      label:'Tours totales',    icon:'🗺️',  color:'bg-blue-50 border-blue-100',   txt:'text-blue-700'},
+                  {val: state.tourStats.activos,    label:'Tours en curso',   icon:'✈️',  color:'bg-emerald-50 border-emerald-100', txt:'text-emerald-700'},
+                  {val: state.tourStats.alumnos,    label:'Alumnos totales',  icon:'👤',  color:'bg-purple-50 border-purple-100', txt:'text-purple-700'},
+                  {val: state.tourStats.pendientes, label:'Docs pendientes',  icon:'⚠️',  color:'bg-amber-50 border-amber-100',  txt:'text-amber-700'}
+                ]; track kpi.label) {
+                  <div [class]="'rounded-2xl p-5 border ' + kpi.color">
+                    <span class="text-3xl">{{ kpi.icon }}</span>
+                    <p [class]="'text-3xl font-black mt-2 ' + kpi.txt">{{ kpi.val }}</p>
+                    <p class="text-xs text-slate-500 mt-1 font-semibold">{{ kpi.label }}</p>
+                  </div>
+                }
+              </div>
+
+              <!-- Tabla resumen de tours -->
+              <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100">
+                  <h3 class="font-black text-slate-700">Todos los tours</h3>
+                </div>
+                <table class="w-full">
+                  <thead>
+                    <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <th class="px-6 py-3 text-left">Tour</th>
+                      <th class="px-6 py-3 text-left">Grupo</th>
+                      <th class="px-6 py-3 text-left">Fechas</th>
+                      <th class="px-6 py-3 text-left">Alumnos</th>
+                      <th class="px-6 py-3 text-left">Estado</th>
+                      <th class="px-6 py-3 text-left">Docs</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (t of state.tours; track t.id) {
+                      <tr (click)="state.selectTour(t)"
+                          class="border-t border-slate-50 hover:bg-blue-50 cursor-pointer transition-colors">
+                        <td class="px-6 py-3">
+                          <div class="flex items-center gap-3">
+                            <span class="text-xl">{{ t.emoji }}</span>
+                            <div>
+                              <p class="font-bold text-sm text-slate-700">{{ t.nombre }}</p>
+                              <p class="text-xs text-slate-400">{{ t.destino }}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-3">
+                          <span class="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">{{ t.grupo }}</span>
+                        </td>
+                        <td class="px-6 py-3 text-sm text-slate-600">{{ t.fechas }}</td>
+                        <td class="px-6 py-3 text-sm font-bold text-slate-700">{{ t.alumnos }}</td>
+                        <td class="px-6 py-3">
+                          <span [class]="'text-xs font-bold px-2.5 py-1 rounded-full ' + badgeCls(t.estado)">
+                            {{ badgeLabel(t.estado) }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-3">
+                          @if (hasWarning(t)) {
+                            <span class="text-xs text-amber-500 font-bold">⚠️ Pendiente</span>
+                          } @else {
+                            <span class="text-xs text-emerald-500 font-bold">✅ OK</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="text-center text-sm text-slate-400 mt-8">
+                ← Selecciona un tour del panel izquierdo para ver su detalle
+              </p>
+            </div>
+          }
+
+          @case ('tour-detail') {
+            <!-- Tour detail en escritorio: layout de 2 columnas -->
+            <div class="p-6 max-w-5xl anim-fade">
+              @if (state.selectedTour(); as t) {
+                <!-- Header -->
+                <div class="rounded-2xl p-6 mb-6 flex items-center gap-5 text-white"
+                     [style.background]="t.gradiente">
+                  <span class="text-6xl" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))">{{ t.emoji }}</span>
+                  <div class="flex-1">
+                    <h2 class="text-2xl font-black">{{ t.nombre }}</h2>
+                    <p class="text-white/75 mt-1">{{ t.destino }}</p>
+                    <div class="flex items-center gap-3 mt-2">
+                      <span class="text-white/70 text-sm">📅 {{ t.fechas }}</span>
+                      <span class="text-white/70 text-sm">🎓 {{ t.grupo }}</span>
+                      <span class="text-white/70 text-sm">👤 {{ t.alumnos }} alumnos</span>
+                      <span [class]="'text-xs font-bold px-3 py-0.5 rounded-full border ' + badgeCls(t.estado)">
+                        {{ badgeLabel(t.estado) }}
+                      </span>
+                    </div>
+                  </div>
+                  @if (t.itinerario.length > 0) {
+                    <button (click)="state.openItinerary()"
+                      class="bg-white/20 hover:bg-white/30 text-white font-black px-6 py-3 rounded-xl
+                             border border-white/30 transition-all text-sm backdrop-blur flex-shrink-0">
+                      📅 Ver Itinerario
+                    </button>
+                  }
+                </div>
+
+                <!-- 2 columns -->
+                <div class="grid grid-cols-2 gap-5">
+                  <!-- Profesores -->
+                  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">
+                      👨‍🏫 Profesores responsables
+                    </h3>
+                    <div class="space-y-3">
+                      @for (p of t.profesores; track p.nombre) {
+                        <div class="flex items-center gap-3">
+                          <div class="w-11 h-11 rounded-full flex items-center justify-center text-white font-black text-sm flex-shrink-0"
+                               [style.background]="t.gradiente">{{ p.iniciales }}</div>
+                          <div>
+                            <p class="font-bold text-slate-700">{{ p.nombre }}</p>
+                            <p class="text-xs text-slate-400">{{ p.rol }}</p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Documentación -->
+                  <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">
+                      📁 Documentación
+                    </h3>
+                    <div>
+                      @for (doc of t.documentos; track doc.nombre) {
+                        <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
+                          <span>{{ doc.estado === 'ok' ? '📄' : '⚠️' }}</span>
+                          <span class="text-sm text-slate-700 flex-1">{{ doc.nombre }}</span>
+                          @if (doc.estado === 'warning') {
+                            <span class="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Pendiente</span>
+                          } @else {
+                            <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @case ('itinerary') {
+            <!-- Itinerario escritorio: panel completo -->
+            <div class="p-6 max-w-4xl anim-fade">
+              @if (state.selectedTour(); as t) {
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-sm text-slate-400 mb-5">
+                  <button (click)="state.navigate('dashboard')" class="hover:text-blue-600 transition-colors font-semibold">Tours</button>
+                  <span>›</span>
+                  <button (click)="state.navigate('tour-detail')" class="hover:text-blue-600 transition-colors font-semibold">{{ t.nombre }}</button>
+                  <span>›</span>
+                  <span class="text-slate-600 font-bold">Itinerario</span>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-6">
+                  @for (d of t.itinerario; track $index) {
+                    <button (click)="state.setDay($index)"
+                      [class]="'px-5 py-2.5 rounded-xl text-sm font-black transition-all '
+                               + (state.selectedDay() === $index
+                                  ? 'text-white shadow-md'
+                                  : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-200')"
+                      [style.background]="state.selectedDay() === $index ? t.gradiente : ''">
+                      Día {{ $index + 1 }} · {{ d.dia }}
+                    </button>
+                  }
+                </div>
+
+                <!-- Timeline + CTA en 2 columnas -->
+                <div class="grid grid-cols-3 gap-5">
+                  <!-- Timeline -->
+                  <div class="col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                    <div class="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 class="font-black text-slate-700">{{ t.itinerario[state.selectedDay()].dia }}</h3>
+                        <p class="text-xs text-slate-400">{{ t.itinerario[state.selectedDay()].resumen }}</p>
+                      </div>
+                      <span class="text-xs text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                        {{ t.itinerario[state.selectedDay()].actividades.length }} actividades
+                      </span>
+                    </div>
+                    <div>
+                      @for (a of t.itinerario[state.selectedDay()].actividades; track $index) {
+                        <div class="flex gap-4 relative">
+                          @if ($index < t.itinerario[state.selectedDay()].actividades.length - 1) {
+                            <div class="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-100 z-0"></div>
+                          }
+                          <div class="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0 z-10 text-lg">
+                            {{ a.icon }}
+                          </div>
+                          <div class="flex-1 pb-5">
+                            <span class="text-xs font-black text-blue-600">{{ a.hora }}</span>
+                            <p class="text-sm text-slate-700 mt-0.5">{{ a.desc }}</p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Panel lateral con CTA -->
+                  <div class="space-y-4">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                      <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Tour</h4>
+                      <div class="flex items-center gap-3">
+                        <span class="text-3xl">{{ t.emoji }}</span>
+                        <div>
+                          <p class="font-black text-sm text-slate-700">{{ t.nombre }}</p>
+                          <p class="text-xs text-slate-400">{{ t.grupo }} · {{ t.alumnos }} alumnos</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button (click)="state.notify()"
+                      class="w-full text-white py-4 rounded-2xl font-black text-sm
+                             flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
+                      style="background:linear-gradient(135deg,#2563eb,#4338ca)">
+                      🔔 Notificar cambio de hora
+                    </button>
+
+                    <div class="bg-blue-50 rounded-2xl p-4 border border-blue-100 text-center">
+                      <p class="text-xs text-blue-600 font-semibold">
+                        La notificación se enviará a {{ t.alumnos }} alumnos y {{ t.profesores.length }} profesores
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </main>
+    </div>
+  }
+
+</div>
+}
+
+
+<!-- ================================================================
+     MODO MÓVIL — marco de teléfono
+     ================================================================ -->
+@if (state.viewMode() === 'mobile') {
+<div class="min-h-screen flex flex-col items-center py-10 px-4"
+     style="background:radial-gradient(ellipse at 60% 20%,#1e3a8a 0%,#0f172a 70%)">
+
+  <!-- Toggle encima del teléfono -->
+  <div class="mb-6 flex items-center gap-1 bg-white/10 backdrop-blur rounded-full p-1.5 border border-white/20 shadow-xl">
+    <button class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-slate-800 text-xs font-black shadow">
+      📱 Móvil
+    </button>
+    <button (click)="state.toggleViewMode()"
+      class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white/70 text-xs font-bold hover:text-white hover:bg-white/10 transition-all">
+      🖥️ Escritorio
+    </button>
+  </div>
+
+  <!-- Marco del iPhone -->
+  <div class="relative" style="width:393px">
+
+    <!-- Botón de volumen izquierdo (decorativo) -->
+    <div class="absolute -left-2 top-[120px] w-1.5 h-10 bg-slate-700 rounded-r-sm"></div>
+    <div class="absolute -left-2 top-[170px] w-1.5 h-10 bg-slate-700 rounded-r-sm"></div>
+    <div class="absolute -left-2 top-[80px]  w-1.5 h-7  bg-slate-700 rounded-r-sm"></div>
+    <!-- Botón derecho (decorativo) -->
+    <div class="absolute -right-2 top-[130px] w-1.5 h-16 bg-slate-700 rounded-l-sm"></div>
+
+    <!-- Carcasa -->
+    <div class="bg-slate-900 rounded-[3.2rem] p-[10px]"
+         style="box-shadow:0 50px 100px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1)">
+
+      <!-- Pantalla -->
+      <div class="bg-white rounded-[2.5rem] overflow-hidden relative"
+           style="height:810px">
+
+        <!-- Dynamic Island -->
+        <div class="absolute top-3 left-1/2 -translate-x-1/2 z-50
+                    w-28 h-8 bg-slate-950 rounded-full flex items-center justify-center gap-2">
+          <div class="w-3 h-3 rounded-full border-2 border-slate-700"></div>
+          <div class="w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+        </div>
+
+        <!-- Contenido de la pantalla -->
+        <div class="w-full h-full overflow-y-auto no-scrollbar" style="padding-top:3rem">
+          @switch (state.screen()) {
+            @case ('login')      { <app-login /> }
+            @case ('dashboard')  { <app-dashboard /> }
+            @case ('tour-detail'){ <app-tour-detail /> }
+            @case ('itinerary')  { <app-itinerary /> }
+          }
+        </div>
+
+        <!-- Home indicator -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2
+                    w-28 h-1 bg-slate-900 rounded-full z-50 opacity-40"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-slate-500 text-xs mt-5 font-medium">iPhone 15 Pro · 393 × 852</p>
+</div>
+}
+
+
+<!-- ================================================================
+     MODAL notificación (ambos modos)
+     ================================================================ -->
+@if (state.showNotify()) {
+  <app-notify-modal />
+}

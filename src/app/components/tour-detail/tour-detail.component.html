@@ -1,0 +1,96 @@
+<div class="anim-fade flex flex-col min-h-full">
+
+  <!-- Hero header -->
+  <div class="px-5 pt-6 pb-14" [style.background]="tour.gradiente">
+    <button (click)="state.navigate('dashboard')"
+      class="text-white/80 text-sm flex items-center gap-1 mb-5 hover:text-white transition-colors">
+      ← Volver
+    </button>
+    <div class="flex items-center gap-4">
+      <span class="text-5xl" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))">{{ tour.emoji }}</span>
+      <div>
+        <h2 class="text-white text-xl font-black leading-tight">{{ tour.nombre }}</h2>
+        <p class="text-white/75 text-sm mt-1">{{ tour.destino }}</p>
+        <span [class]="'inline-block mt-2 text-xs font-bold px-3 py-0.5 rounded-full border ' + badgeCls(tour.estado)">
+          {{ badgeLabel(tour.estado) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content cards -->
+  <div class="px-4 -mt-6 pb-8 space-y-4 flex-1 overflow-y-auto no-scrollbar">
+
+    <!-- Info grid -->
+    <div class="bg-white rounded-2xl shadow-md p-4">
+      <div class="grid grid-cols-2 gap-2.5">
+        @for (info of [
+          {label:'Fechas',    val:'📅 ' + tour.fechas},
+          {label:'Grupo',     val:'🎓 ' + tour.grupo},
+          {label:'Alumnos',   val:'👤 ' + tour.alumnos + ' alumnos'},
+          {label:'Coste',     val:'💶 ' + tour.presupuesto}
+        ]; track info.label) {
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wide mb-1">{{ info.label }}</p>
+            <p class="text-sm font-bold text-slate-700">{{ info.val }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Profesores -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+      <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+        👨‍🏫 Profesores responsables
+      </h3>
+      <div class="space-y-3">
+        @for (p of tour.profesores; track p.nombre) {
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-xs flex-shrink-0"
+                 [style.background]="tour.gradiente">
+              {{ p.iniciales }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-slate-700">{{ p.nombre }}</p>
+              <p class="text-xs text-slate-400">{{ p.rol }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Documentación -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+      <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+        📁 Documentación
+      </h3>
+      @for (doc of tour.documentos; track doc.nombre) {
+        <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
+          <span class="text-lg">{{ doc.estado === 'ok' ? '📄' : '⚠️' }}</span>
+          <span class="text-sm text-slate-700 flex-1 leading-tight">{{ doc.nombre }}</span>
+          @if (doc.estado === 'warning') {
+            <span class="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Pendiente</span>
+          } @else {
+            <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">OK</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- CTA -->
+    @if (tour.itinerario.length > 0) {
+      <button (click)="state.openItinerary()"
+        class="w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 text-white
+               active:scale-95 transition-all shadow-lg"
+        [style.background]="tour.gradiente">
+        📅 Ver Itinerario →
+      </button>
+    } @else {
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+        <p class="text-amber-700 text-sm font-bold">⏳ Itinerario en preparación</p>
+        <p class="text-amber-500 text-xs mt-1">Disponible próximamente</p>
+      </div>
+    }
+
+  </div>
+</div>

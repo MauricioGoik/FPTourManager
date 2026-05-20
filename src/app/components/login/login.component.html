@@ -1,0 +1,43 @@
+<div class="flex items-center justify-center min-h-full p-6 anim-fade"
+     style="background:linear-gradient(145deg,#1e3a8a 0%,#2563eb 60%,#3b82f6 100%)">
+
+  <div [class]="state.viewMode() === 'desktop' ? 'w-full max-w-md' : 'w-full max-w-xs'">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
+        <span class="text-5xl">✈️</span>
+      </div>
+      <h1 class="text-white text-3xl font-black tracking-tight">FPTour</h1>
+      <p class="text-blue-200 text-sm font-semibold tracking-widest uppercase mt-0.5">Manager</p>
+      <p class="text-blue-100/70 text-xs mt-2">Gestión de Viajes Educativos · IES Tajamar</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl p-6 shadow-2xl">
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+          Correo electrónico
+        </label>
+        <input type="email" value="m.garcia@centrofp.es"
+          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+          Contraseña
+        </label>
+        <input type="password" value="demo1234"
+          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+      </div>
+      <button (click)="doLogin()" [disabled]="loading"
+        class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm
+               hover:bg-blue-700 active:scale-95 transition-all shadow-lg disabled:opacity-60">
+        {{ loading ? 'Entrando...' : 'Iniciar Sesión' }}
+      </button>
+      <p class="text-center text-xs text-slate-400 mt-4">🔒 Demo: cualquier credencial funciona</p>
+    </div>
+
+  </div>
+</div>

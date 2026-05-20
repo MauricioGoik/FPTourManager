@@ -1,0 +1,90 @@
+<!-- Mobile full-screen dashboard -->
+<div class="flex flex-col min-h-full anim-fade">
+
+  <!-- Header azul con KPIs -->
+  <div class="px-5 pt-6 pb-12" style="background:linear-gradient(135deg,#1d4ed8,#2563eb)">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-blue-200 text-xs font-bold uppercase tracking-widest">Panel de Control</p>
+        <h2 class="text-white text-xl font-black mt-0.5">Hola, Marta 👋</h2>
+        <p class="text-blue-100/70 text-xs mt-0.5">Coordinadora · IES Tajamar</p>
+      </div>
+      <button (click)="logout()"
+        class="w-11 h-11 rounded-full bg-white/20 text-white font-black text-xs
+               hover:bg-white/30 transition-colors border border-white/20 backdrop-blur">
+        MG
+      </button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-4 gap-2 mt-5">
+      @for (kpi of [
+        {val: state.tourStats.total,      label:'Tours'},
+        {val: state.tourStats.activos,    label:'En curso'},
+        {val: state.tourStats.alumnos,    label:'Alumnos'},
+        {val: state.tourStats.pendientes, label:'Pendientes'}
+      ]; track kpi.label) {
+        <div class="bg-white/15 rounded-xl p-2.5 text-center border border-white/10 backdrop-blur">
+          <p class="text-white text-xl font-black leading-none">{{ kpi.val }}</p>
+          <p class="text-blue-100 text-[10px] mt-0.5">{{ kpi.label }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Tour list, solapándose sobre el header -->
+  <div class="-mt-6 px-4 pb-8 flex-1 overflow-y-auto no-scrollbar">
+
+    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2.5 mt-2 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>Tours Activos
+    </p>
+    @for (t of toursActivos; track t.id) {
+      <ng-container *ngTemplateOutlet="tourCard; context:{t}"></ng-container>
+    }
+
+    <p class="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-2.5 mt-5 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>Próximos Tours
+    </p>
+    @for (t of toursPlanificados; track t.id) {
+      <ng-container *ngTemplateOutlet="tourCard; context:{t}"></ng-container>
+    }
+
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2.5 mt-5 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>Finalizados
+    </p>
+    @for (t of toursCompletados; track t.id) {
+      <ng-container *ngTemplateOutlet="tourCard; context:{t}"></ng-container>
+    }
+
+  </div>
+</div>
+
+<!-- Tour card template -->
+<ng-template #tourCard let-t="t">
+  <div (click)="selectTour(t)"
+    [class]="'bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all '
+             + (t.estado === 'completado' ? 'opacity-60' : '')">
+    <div class="p-4 flex items-center gap-3" [style.background]="t.gradiente">
+      <span class="text-4xl" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))">{{ t.emoji }}</span>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-white font-black text-sm leading-tight truncate">{{ t.nombre }}</h3>
+        <p class="text-white/75 text-xs mt-0.5 truncate">{{ t.destino }}</p>
+      </div>
+      <div class="flex flex-col items-end gap-1">
+        <span class="bg-white/25 text-white text-xs px-2 py-0.5 rounded-full font-bold backdrop-blur">{{ t.grupo }}</span>
+        @if (hasWarning(t)) {
+          <span class="bg-amber-400 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">⚠️ Docs</span>
+        }
+      </div>
+    </div>
+    <div class="px-4 py-2.5 flex items-center justify-between">
+      <p class="text-xs text-slate-500">📅 <span class="font-bold text-slate-700">{{ t.fechas }}</span></p>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-400">👤 {{ t.alumnos }}</span>
+        <span [class]="'text-xs font-bold px-2.5 py-0.5 rounded-full border ' + badgeCls(t.estado)">
+          {{ badgeLabel(t.estado) }}
+        </span>
+      </div>
+    </div>
+  </div>
+</ng-template>
